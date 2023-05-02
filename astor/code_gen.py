@@ -710,9 +710,11 @@ class SourceGenerator(ExplicitNodeVisitor):
         with self.delimit(node) as delimiters:
             # Two things are special about tuples:
             #   1) We cannot discard the enclosing parentheses if empty
+            #      another case is if the tuple is inside a x[] subscript expression,
+            #      since x[(*something, ...)] is valid Python but x[*something, ...] is not
             #   2) We need the trailing comma if only one item
             elts = node.elts
-            delimiters.discard = delimiters.discard and elts
+            delimiters.discard = False  # playing it safe (was: delimiters.discard and elts)
             self.comma_list(elts, len(elts) == 1)
 
     def visit_List(self, node):
